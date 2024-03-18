@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/Stack.dir/tests.cpp.o -o Stack 
