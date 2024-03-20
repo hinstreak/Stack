@@ -8,45 +8,44 @@ template<typename T>
 class Stack
 {
 private:
-    struct Node
+    class Node
     {
+    public:
         T data;
         Node* next;
         Node(const T& data) : data(data), next(nullptr) {}
     };
-
-    Node* top_node;
+    Node* top_n;
     std::size_t stack_size;
 
 public:
     Stack();
 
-    Stack(const Stack& other);
-    Stack(Stack&& other) noexcept;
+    Stack(const Stack& another);
+    Stack(Stack&& another) noexcept;
+    ~Stack();
 
     Stack& operator=(const Stack& other);
     Stack& operator=(Stack&& other) noexcept;
 
-    ~Stack();
-
-    void push(const T& value);
     void pop();
     T& top();
+    void push(const T& val);
+    void push(T&& val);
+
     bool empty() const;
     std::size_t size() const;
 };
 
 template<typename T>
-Stack<T>::Stack() : top_node(nullptr), stack_size(0) {}
+Stack<T>::Stack() : top_n(nullptr), stack_size(0) {}
 
 template<typename T>
-Stack<T>::Stack(const Stack& other) : top_node(nullptr), stack_size(0)
+Stack<T>::Stack(const Stack& other) : top_n(nullptr), stack_size(0)
 {
-    static_assert(std::is_copy_constructible<T>::value, "T must be copy constructible");
-
-    Node* other_current = other.top_node;
+    Node* other_current = other.top_n;
     Stack<T> temp_stack;
-    while (other_current)
+    while (other_current != nullptr)
     {
         temp_stack.push(other_current->data);
         other_current = other_current->next;
@@ -60,23 +59,30 @@ Stack<T>::Stack(const Stack& other) : top_node(nullptr), stack_size(0)
 }
 
 template<typename T>
-Stack<T>::Stack(Stack&& other) noexcept : top_node(nullptr), stack_size(0)
+Stack<T>::Stack(Stack&& other) noexcept : top_n(nullptr), stack_size(0)
 {
-    static_assert(std::is_move_constructible<T>::value, "T must be move constructible");
-
-    std::swap(top_node, other.top_node);
+    std::swap(top_n, other.top_n);
     std::swap(stack_size, other.stack_size);
+}
+
+template<typename T>
+Stack<T>::~Stack()
+{
+    while (top_n != nullptr)
+    {
+        Node* temp = top_n;
+        top_n = top_n->next;
+        delete temp;
+    }
 }
 
 template<typename T>
 Stack<T>& Stack<T>::operator=(const Stack& other)
 {
-    static_assert(std::is_copy_assignable<T>::value, "T must be copy assignable");
-
     if (this != &other)
     {
         Stack temp(other);
-        std::swap(top_node, temp.top_node);
+        std::swap(top_n, temp.top_n);
         std::swap(stack_size, temp.stack_size);
     }
 
@@ -86,39 +92,32 @@ Stack<T>& Stack<T>::operator=(const Stack& other)
 template<typename T>
 Stack<T>& Stack<T>::operator=(Stack&& other) noexcept
 {
-    static_assert(std::is_move_assignable<T>::value, "T must be move assignable");
-
     if (this != &other)
     {
-        delete top_node;
-        top_node = nullptr;
+        delete top_n;
+        top_n = nullptr;
         stack_size = 0;
-        std::swap(top_node, other.top_node);
+        std::swap(top_n, other.top_n);
         std::swap(stack_size, other.stack_size);
     }
-
     return *this;
-}
-
-template<typename T>
-Stack<T>::~Stack()
-{
-    static_assert(std::is_destructible<T>::value, "T must be destructible");
-
-    while (top_node)
-    {
-        Node* temp = top_node;
-        top_node = top_node->next;
-        delete temp;
-    }
 }
 
 template<typename T>
 void Stack<T>::push(const T& value)
 {
     Node* new_node = new Node(value);
-    new_node->next = top_node;
-    top_node = new_node;
+    new_node->next = top_n;
+    top_n = new_node;
+    ++stack_size;
+}
+
+template<typename T>
+void Stack<T>::push(T&& value)
+{
+    Node* new_node = new Node(std::move(value));
+    new_node->next = top_n;
+    top_n = new_node;
     ++stack_size;
 }
 
@@ -128,25 +127,24 @@ void Stack<T>::pop()
     if (empty())
         throw std::out_of_range("Stack is empty");
 
-    Node* temp = top_node;
-    top_node = top_node->next;
+    Node* temp = top_n;
+    top_n = top_n->next;
     delete temp;
     --stack_size;
 }
-
 template<typename T>
 T& Stack<T>::top()
 {
     if (empty())
         throw std::out_of_range("Stack is empty");
 
-    return top_node->data;
+    return top_n->data;
 }
 
 template<typename T>
 bool Stack<T>::empty() const
 {
-    return top_node == nullptr;
+    return top_n == nullptr;
 }
 
 template<typename T>

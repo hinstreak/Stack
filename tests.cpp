@@ -170,7 +170,6 @@ bool test_move_assignment()
         copied_stack.pop();
         moved_stack.pop();
     }
-
     return true;
 }
 
@@ -191,9 +190,7 @@ bool test_top()
     {
         value = "18.65";
     }
-
     stack.push(value);
-
     return stack.top() == value;
 }
 
@@ -214,9 +211,7 @@ bool test_push()
     {
         value = "18.65";
     }
-
     stack.push(value);
-
     return stack.top() == value;
 }
 
@@ -237,11 +232,8 @@ bool test_pop()
     {
         value = "18.65";
     }
-
     stack.push(value);
-
     stack.pop();
-
     return stack.empty();
 }
 
@@ -262,10 +254,6 @@ void run_test(const char* name, std::function<bool()> test)
     catch (const std::exception& e)
     {
         std::cerr << "[EXCEPTION]" << e.what() << std::endl;
-    }
-    catch (...)
-    {
-        std::cerr << "[ERROR]" << std::endl;
     }
 }
 
@@ -300,6 +288,4 @@ int main()
     run_test("std::string_copy_assignment", test_copy_assignment<std::string>);
     run_test("std::string_move_assignment", test_move_assignment<std::string>);
     printf("========================\n");
-
-
 }

@@ -1,3 +1,0 @@
-/home/hinstreak/CLionProjects/Stack/build/CMakeFiles/Stack.dir
-/home/hinstreak/CLionProjects/Stack/build/CMakeFiles/edit_cache.dir
-/home/hinstreak/CLionProjects/Stack/build/CMakeFiles/rebuild_cache.dir
